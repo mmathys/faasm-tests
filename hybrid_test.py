@@ -4,7 +4,7 @@ import hashlib
 from faasmtools.endpoints import get_faasm_invoke_host_port, get_faasm_upload_host_port
 
 def foo(data):
-    print("hello from foo.")
+    print(f"passed data: {data}")
     return 0
 
 def call_faasm_function(fn, arg):
@@ -12,7 +12,7 @@ def call_faasm_function(fn, arg):
 
     m = hashlib.sha256()
     m.update(source.encode())
-    func_hash = m.hexdigest()
+    func_hash = m.hexdigest()[:32]
 
     # upload function
     host, port = get_faasm_upload_host_port()
@@ -29,7 +29,8 @@ def call_faasm_function(fn, arg):
         "py_user": "python",
         "py_func": func_hash,
         "python": True,
-        "py_entry": fn.__name__
+        "py_entry": fn.__name__,
+        "input_data": arg
     }
 
     response = requests.post(url, json=data)
